@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jogo da Velha</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      margin: auto;
+    }
+
+    td {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 24px;
+      border: 1px solid black;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">Jogo da Velha</h1>
+  <table>
+    <tr>
+      <td onclick="makeMove(0, 0)"></td>
+      <td onclick="makeMove(0, 1)"></td>
+      <td onclick="makeMove(0, 2)"></td>
+    </tr>
+    <tr>
+      <td onclick="makeMove(1, 0)"></td>
+      <td onclick="makeMove(1, 1)"></td>
+      <td onclick="makeMove(1, 2)"></td>
+    </tr>
+    <tr>
+      <td onclick="makeMove(2, 0)"></td>
+      <td onclick="makeMove(2, 1)"></td>
+      <td onclick="makeMove(2, 2)"></td>
+    </tr>
+  </table>
+  <p class="message" id="message">É a vez do jogador X</p>
+
+  <script>
+    let currentPlayer = "X";
+    let gameBoard = [
+      ["", "", ""],
+      ["", "", ""],
+      ["", "", ""]
+    ];
+    let gameEnded = false;
+
+    function checkWinner() {
+      const winningCombinations = [
+        // Rows
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        // Columns
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        // Diagonals
+        [0, 4, 8],
+        [2, 4, 6]
+      ];
+
+      for (let combination of winningCombinations) {
+        const [a, b, c] = combination;
+        if (
+          gameBoard[Math.floor(a / 3)][a % 3] &&
+          gameBoard[Math.floor(a / 3)][a % 3] === gameBoard[Math.floor(b / 3)][b % 3] &&
+          gameBoard[Math.floor(a / 3)][a % 3] === gameBoard[Math.floor(c / 3)][c % 3]
+        ) {
+          gameEnded = true;
+          return gameBoard[Math.floor(a / 3)][a % 3];
+        }
+      }
+
+      if (gameBoard.flat().every(cell => cell !== "")) {
+        gameEnded = true;
+        return "draw";
+      }
+
+      return null;
+    }
+
+    function makeMove(row, col) {
+      if (gameEnded || gameBoard[row][col] !== "") {
+        return;
+      }
+
+      gameBoard[row][col] = currentPlayer;
+      document.getElementById("message").innerText =
+        currentPlayer === "X" ? "É a vez do jogador O" : "É a vez do jogador X";
+      document.getElementsByTagName("td")[row * 3 + col].innerText = currentPlayer;
+
+      const winner = checkWinner();
+      if (winner) {
+        let message = "Empate!";
+        if (winner !== "draw") {
+          message = `Jogador ${winner} venceu!`;
+        }
+        document.getElementById("message").innerText = message;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+    }
+
+    function resetGame() {
+      gameBoard = [
+        ["", "", ""],
+        ["", "", ""],
+        ["", "", ""]
+      ];
+      gameEnded = false;
+      currentPlayer = "X";
+      document.getElementById("message").innerText = "É a vez do jogador X";
+
+      const cells = document.getElementsByTagName("td");
+      for (let i = 0; i < cells.length; i++) {
+        cells[i].innerText = "";
+      }
+    }
+  </script>
+</body>
+</html>
